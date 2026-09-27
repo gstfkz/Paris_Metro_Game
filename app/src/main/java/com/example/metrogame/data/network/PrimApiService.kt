@@ -6,7 +6,7 @@ import retrofit2.http.Query
 
 /**
  * API PRIM (Île-de-France Mobilités), moteur Navitia, périmètre "fr-idf".
- * Base URL : https://prim.iledefrance-mobilites.fr/marketplace/navitia/coverage/fr-idf/
+ * Base URL : https://prim.iledefrance-mobilites.fr/marketplace/v2/navitia/
  * Authentification : header "apikey" (voir PrimApiClient), PAS de Bearer/OAuth.
  *
  * NB : ces signatures sont établies à partir de la documentation Navitia générale ;
@@ -46,7 +46,7 @@ interface PrimApiService {
     ): JourneysResponseDto
 
     companion object {
-        const val BASE_URL = "https://prim.iledefrance-mobilites.fr/marketplace/navitia/coverage/fr-idf/"
+        const val BASE_URL = "https://prim.iledefrance-mobilites.fr/marketplace/v2/navitia/"
 
         const val FILTER_METRO = "physical_mode.id=physical_mode:Metro"
         const val FILTER_RER = "physical_mode.id=physical_mode:RapidTransit"
