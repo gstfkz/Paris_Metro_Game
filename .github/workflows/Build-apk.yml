@@ -70,6 +70,19 @@ jobs:
           printf 'PRIM_API_KEY=%s\n' "$PRIM_API_KEY" >> local.properties
 
           echo "local.properties créé."
+          
+      - name: Verify PRIM secret
+        shell: bash
+        env:
+          PRIM_API_KEY: ${{ secrets.PRIM_API_KEY }}
+        run: |
+          if [ -z "$PRIM_API_KEY" ]; then
+            echo "ERREUR : PRIM_API_KEY est vide"
+            exit 1
+          else
+            echo "PRIM_API_KEY est présente"
+            echo "Longueur : ${#PRIM_API_KEY} caractères"
+          fi
 
       - name: Build debug APK
         run: |
