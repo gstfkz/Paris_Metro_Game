@@ -30,7 +30,7 @@ class MetroRepository(private val api:PrimApiService){
     val toName=toArea?.name?:s.to?.name?:toId
     when(s.type){
      "public_transport"->{val info=s.display_informations?:return@mapNotNull null; val pm=info.physical_mode.orEmpty(); val mode=if(pm.contains("RapidTransit",true)||info.commercial_mode.orEmpty().contains("RER",true))TransportMode.RER else TransportMode.METRO; OfficialSegment("",info.code?:info.commercial_mode.orEmpty(),mode,fromId,fromName,toId,toName,s.duration)}
-     "street_network","crow_fly"->OfficialSegment("walk","Marche",TransportMode.WALK,fromId,fromName,toId,toName,s.duration)
+     "street_network","crow_fly"->if(fromId==toId || fromName.trim().equals(toName.trim(),ignoreCase=true)) null else OfficialSegment("walk","Marche",TransportMode.WALK,fromId,fromName,toId,toName,s.duration)
      else->null
     }
    }
