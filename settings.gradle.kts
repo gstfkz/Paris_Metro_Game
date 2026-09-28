@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "MetroGame"
+rootProject.name = "ParisMetroGame"
 include(":app")

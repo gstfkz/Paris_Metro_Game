@@ -14,26 +14,41 @@ val localProperties = Properties().apply {
     if (file.exists()) load(file.inputStream())
 }
 val primApiKey: String = localProperties.getProperty("PRIM_API_KEY") ?: ""
+val updateRepository: String = localProperties.getProperty("UPDATE_REPOSITORY") ?: ""
 
 android {
-    namespace = "com.example.metrogame"
+    namespace = "com.gstfkz.parismetrogame"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.metrogame"
+        applicationId = "com.gstfkz.parismetrogame"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 5
+        versionName = "0.5b"
 
         // Clé API PRIM (Île-de-France Mobilités / Navitia) lue depuis local.properties
         // pour ne pas la committer en clair dans le code. Voir README.md.
         buildConfigField("String", "PRIM_API_KEY", "\"$primApiKey\"")
+        buildConfigField("String", "UPDATE_REPOSITORY", "\"$updateRepository\"")
+    }
+
+    signingConfigs {
+        create("release") {
+            val ks = System.getenv("KEYSTORE_FILE")
+            if (!ks.isNullOrBlank()) {
+                storeFile = file(ks)
+                storePassword = System.getenv("KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("KEY_ALIAS")
+                keyPassword = System.getenv("KEY_PASSWORD")
+            }
+        }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 

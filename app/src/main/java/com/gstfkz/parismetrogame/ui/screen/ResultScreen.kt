@@ -1,0 +1,8 @@
+package com.gstfkz.parismetrogame.ui.screen
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.gstfkz.parismetrogame.data.model.*
+@Composable fun ResultScreen(won:Boolean,score:Int,userSegments:List<UserSegment>,officialJourneys:List<OfficialJourney>,onContinue:()->Unit,onQuit:()->Unit){Column(Modifier.fillMaxSize().padding(24.dp)){Text(if(won)"Gagné !" else "Perdu",style=MaterialTheme.typography.headlineLarge);Text("Série : $score",style=MaterialTheme.typography.titleMedium,modifier=Modifier.padding(top=8.dp));if(!won){HorizontalDivider(Modifier.padding(vertical=16.dp));Text("Ton itinéraire :",style=MaterialTheme.typography.titleMedium);userSegments.filter{it.isComplete}.forEach{Text("${it.line?.displayName} : ${it.departureStation?.name} → ${it.arrivalStation?.name}")};HorizontalDivider(Modifier.padding(vertical=16.dp));Text(if(officialJourneys.size>1)"Itinéraires officiels ex æquo :" else "Itinéraire officiel :",style=MaterialTheme.typography.titleMedium);officialJourneys.forEachIndexed{idx,j->if(officialJourneys.size>1)Text("Option ${idx+1}",style=MaterialTheme.typography.titleSmall,modifier=Modifier.padding(top=8.dp));j.segments.forEach{s->Text("${when(s.mode){TransportMode.RER->"RER ${s.lineCode}";TransportMode.WALK->"Marche";else->"Métro ${s.lineCode}"}} : ${s.fromStationName} → ${s.toStationName}")};Text("Durée : ${j.totalDurationSeconds/60} min")}};Spacer(Modifier.weight(1f));Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceEvenly){Button(onContinue){Text(if(won)"Continuer" else "Rejouer")};OutlinedButton(onQuit){Text("Quitter")}}}}

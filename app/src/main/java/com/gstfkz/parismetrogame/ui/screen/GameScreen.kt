@@ -1,0 +1,16 @@
+package com.gstfkz.parismetrogame.ui.screen
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import com.gstfkz.parismetrogame.data.model.*
+@Composable fun GameScreen(departureStation:MetroStation,arrivalStation:MetroStation,segments:List<UserSegment>,availableLines:List<MetroLine>,stationsForLine:(MetroLine)->List<MetroStation>,onSegmentChange:(Int,UserSegment)->Unit,onAddRow:()->Unit,onRemoveRow:(Int)->Unit,onVerify:()->Unit){Column(Modifier.fillMaxSize().padding(16.dp)){Text("${departureStation.name}  →  ${arrivalStation.name}",style=MaterialTheme.typography.headlineSmall,maxLines=1,overflow=TextOverflow.Ellipsis);HorizontalDivider(Modifier.padding(vertical=16.dp));LazyColumn(Modifier.weight(1f)){items(segments.size){i->SegmentRow(segments[i],availableLines,stationsForLine,{onSegmentChange(i,it)},if(segments.size>1){{onRemoveRow(i)}}else null);HorizontalDivider(Modifier.padding(vertical=10.dp))}};if(segments.lastOrNull()?.isComplete==true)Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){IconButton(onAddRow){Icon(Icons.Default.Add,"Ajouter")};Button(onVerify){Text("Vérifier")}}}}
+@Composable private fun SegmentRow(s:UserSegment,lines:List<MetroLine>,stations:(MetroLine)->List<MetroStation>,change:(UserSegment)->Unit,remove:(()->Unit)?){Column(Modifier.fillMaxWidth()){Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){Dropdown(Modifier.weight(1f),"Ligne",lines,{it.displayName},s.line,true){change(UserSegment(line=it))};remove?.let{IconButton(it){Icon(Icons.Default.Close,"Supprimer")}}};Spacer(Modifier.height(8.dp));Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(8.dp)){val opts=s.line?.let(stations).orEmpty();Dropdown(Modifier.weight(1f),"Départ",opts,{it.name},s.departureStation,s.line!=null){change(s.copy(departureStation=it))};Text("→",Modifier.padding(top=18.dp));Dropdown(Modifier.weight(1f),"Arrivée",opts,{it.name},s.arrivalStation,s.line!=null){change(s.copy(arrivalStation=it))}}}}
+@OptIn(ExperimentalMaterial3Api::class)@Composable private fun<T>Dropdown(modifier:Modifier,label:String,options:List<T>,name:(T)->String,selected:T?,enabled:Boolean,pick:(T)->Unit){var open by remember{mutableStateOf(false)};ExposedDropdownMenuBox(modifier,open&&enabled,{if(enabled)open=it}){OutlinedTextField(selected?.let(name).orEmpty(),{},Modifier.menuAnchor().fillMaxWidth(),enabled=enabled,readOnly=true,label={Text(label)},singleLine=true,trailingIcon={ExposedDropdownMenuDefaults.TrailingIcon(open&&enabled)});DropdownMenu(open&&enabled,{open=false},Modifier.exposedDropdownSize()){options.forEachIndexed{i,o->DropdownMenuItem({Text(name(o),maxLines=1,overflow=TextOverflow.Ellipsis)},{pick(o);open=false});if(i<options.lastIndex)HorizontalDivider()}}}}
