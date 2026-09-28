@@ -13,7 +13,6 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
@@ -47,40 +46,30 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          printf '%s' "$SIGNING_KEY_BASE64" | base64 --decode > "$RUNNER_TEMP/release.jks"
-          test -s "$RUNNER_TEMP/release.jks"
+          printf '%s' "$SIGNING_KEY_BASE64" | base64 --decode > "$RUNNER_TEMP/release.p12"
+          test -s "$RUNNER_TEMP/release.p12"
 
-      - name: Normalize signing key to PKCS12
+      - name: Verify release signing key
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         shell: bash
         run: |
           set -euo pipefail
-          keytool -importkeystore \
-            -srckeystore "$RUNNER_TEMP/release.jks" \
-            -srcstoretype JKS \
-            -srcstorepass "$KEYSTORE_PASSWORD" \
-            -srcalias "$KEY_ALIAS" \
-            -srckeypass "$KEY_PASSWORD" \
-            -destkeystore "$RUNNER_TEMP/release-normalized.p12" \
-            -deststoretype PKCS12 \
-            -deststorepass "$KEYSTORE_PASSWORD" \
-            -destkeypass "$KEYSTORE_PASSWORD" \
-            -destalias "$KEY_ALIAS" \
-            -noprompt
-          test -s "$RUNNER_TEMP/release-normalized.p12"
-          echo "Signing key normalized successfully"
+          keytool -list \
+            -keystore "$RUNNER_TEMP/release.p12" \
+            -storetype PKCS12 \
+            -storepass "$KEYSTORE_PASSWORD" \
+            -alias "$KEY_ALIAS" > /dev/null
+          echo "Release signing key verified"
 
       - name: Build signed release APK
         env:
-          KEYSTORE_FILE: ${{ runner.temp }}/release-normalized.p12
+          KEYSTORE_FILE: ${{ runner.temp }}/release.p12
           KEYSTORE_TYPE: PKCS12
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          # Le PKCS12 normalisé utilise le même mot de passe pour le store et la clé.
-          KEY_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: gradle --no-daemon --stacktrace assembleRelease
 
       - uses: actions/upload-artifact@v4
