@@ -37,6 +37,37 @@ jobs:
           SIGNING_KEY_BASE64: ${{ secrets.SIGNING_KEY_BASE64 }}
         run: |
           echo "$SIGNING_KEY_BASE64" | base64 --decode > "$RUNNER_TEMP/release.jks"
+
+      - name: Verify signing configuration
+        env:
+          KEYSTORE_FILE: ${{ runner.temp }}/release.jks
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          set +x
+          set -e
+
+          test -s "$KEYSTORE_FILE"
+          test -n "$KEYSTORE_PASSWORD"
+          test -n "$KEY_ALIAS"
+          test -n "$KEY_PASSWORD"
+
+          keytool -importkeystore \
+            -srckeystore "$KEYSTORE_FILE" \
+            -srcstorepass "$KEYSTORE_PASSWORD" \
+            -srcalias "$KEY_ALIAS" \
+            -srckeypass "$KEY_PASSWORD" \
+            -destkeystore "$RUNNER_TEMP/signing-test.p12" \
+            -deststoretype PKCS12 \
+            -deststorepass "temporary-test-password" \
+            -destkeypass "temporary-test-password" \
+            -noprompt > /dev/null 2>&1 \
+            || { echo "ERROR: Invalid signing key or credentials"; exit 1; }
+
+          rm -f "$RUNNER_TEMP/signing-test.p12"
+          echo "Signing configuration verified successfully"
+          
       - name: Build signed release APK
         env:
           KEYSTORE_FILE: ${{ runner.temp }}/release.jks
