@@ -74,7 +74,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: Paris-Metro-Game-0.5b
+          name: Paris-Metro-Game-0.6b
           path: app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
           retention-days: 30
