@@ -1,11 +1,84 @@
-// Fichier racine : déclare les plugins utilisés par les sous-modules (ici uniquement :app).
-// NB : les numéros de version ci-dessous sont ceux connus au moment de la rédaction
-// (début 2026). Ouvre le projet dans Android Studio et laisse l'IDE proposer une mise
-// à jour AGP/Kotlin si une version plus récente est disponible : je n'ai pas pu vérifier
-// ces numéros contre le dépôt Maven (pas d'accès réseau depuis mon environnement).
+import java.util.Properties
+
 plugins {
-    id("com.android.application") version "8.7.2" apply false
-    id("org.jetbrains.kotlin.android") version "2.0.21" apply false
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.0.21" apply false
-    id("org.jetbrains.kotlin.plugin.compose") version "2.0.21" apply false
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.serialization")
+    id("org.jetbrains.kotlin.plugin.compose")
+}
+
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) load(file.inputStream())
+}
+val primApiKey: String = localProperties.getProperty("PRIM_API_KEY") ?: ""
+val updateRepository: String = localProperties.getProperty("UPDATE_REPOSITORY") ?: ""
+
+android {
+    namespace = "com.gstfkz.parismetrogame"
+    compileSdk = 35
+
+    defaultConfig {
+        applicationId = "com.gstfkz.parismetrogame"
+        minSdk = 26
+        targetSdk = 35
+        versionCode = 5
+        versionName = "0.5b"
+
+        buildConfigField("String", "PRIM_API_KEY", "\"$primApiKey\"")
+        buildConfigField("String", "UPDATE_REPOSITORY", "\"$updateRepository\"")
+    }
+
+    signingConfigs {
+        create("release") {
+            val ks = System.getenv("KEYSTORE_FILE")
+            if (!ks.isNullOrBlank()) {
+                storeFile = file(ks)
+                storePassword = System.getenv("KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("KEY_ALIAS")
+                keyPassword = System.getenv("KEY_PASSWORD")
+                storeType = System.getenv("KEYSTORE_TYPE") ?: "JKS"
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
+        }
+    }
+
+    buildFeatures {
+        compose = true
+        buildConfig = true
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+}
+
+dependencies {
+    implementation(platform("androidx.compose:compose-bom:2024.12.01"))
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.material:material-icons-extended")
+    implementation("androidx.activity:activity-compose:1.9.3")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
+
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-kotlinx-serialization:2.11.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
+
+    debugImplementation("androidx.compose.ui:ui-tooling")
 }
