@@ -10,6 +10,6 @@ interface PrimApiService {
   const val BASE_URL="https://prim.iledefrance-mobilites.fr/marketplace/v2/navitia/"
   const val FILTER_METRO="physical_mode.id=physical_mode:Metro"
   const val FILTER_RER="physical_mode.id=physical_mode:RapidTransit"
-  val FORBIDDEN_MODES=listOf("physical_mode:Bus","physical_mode:Tramway","physical_mode:LocalTrain","physical_mode:RailShuttle","physical_mode:Coach","physical_mode:Funicular","physical_mode:Boat","physical_mode:Bicycle","physical_mode:BikeSharingService")
+  val BASE_FORBIDDEN_MODES=listOf("physical_mode:Bus","physical_mode:Tramway","physical_mode:LocalTrain","physical_mode:RailShuttle","physical_mode:Coach","physical_mode:Funicular","physical_mode:Boat","physical_mode:Bicycle","physical_mode:BikeSharingService")
  }
 }
