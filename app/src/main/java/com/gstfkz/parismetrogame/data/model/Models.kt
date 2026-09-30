@@ -9,7 +9,7 @@ data class MetroLine(val id:String,val code:String,val name:String,val mode:Tran
 data class MetroStation(val id:String,val name:String)
 data class MetroNetwork(val lines:List<MetroLine>,val stationsByLine:Map<String,List<MetroStation>>)
 data class UserSegment(val line:MetroLine?=null,val departureStation:MetroStation?=null,val arrivalStation:MetroStation?=null){ val isComplete:Boolean get()=line!=null&&departureStation!=null&&arrivalStation!=null }
-data class OfficialSegment(val lineId:String,val lineCode:String,val mode:TransportMode,val fromStationId:String,val fromStationName:String,val toStationId:String,val toStationName:String,val durationSeconds:Int)
+data class OfficialSegment(val lineId:String,val lineCode:String,val mode:TransportMode,val fromStationId:String,val fromStationName:String,val toStationId:String,val toStationName:String,val durationSeconds:Int,val colorHex:String?=null)
 data class OfficialJourney(val segments:List<OfficialSegment>,val totalDurationSeconds:Int)
 data class ScoreEntry(val score:Int,val timestamp:Long)
 sealed class GameScreen {

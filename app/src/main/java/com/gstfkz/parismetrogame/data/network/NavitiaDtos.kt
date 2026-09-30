@@ -96,5 +96,6 @@ data class DisplayInformationsDto(
     val commercial_mode: String? = null,
     val physical_mode: String? = null,
     val code: String? = null, // numéro/lettre de ligne affiché (ex: "1", "A")
+    val color: String? = null,
     val network: String? = null
 )

@@ -13,4 +13,4 @@ import com.gstfkz.parismetrogame.data.model.*
 
 private fun parseColor(hex:String?):Color=try{Color(android.graphics.Color.parseColor(if(hex?.startsWith("#")==true)hex else "#$hex"))}catch(_:Exception){Color(0xFF1C1CD6)}
 @Composable fun LineBadge(line:MetroLine){when(line.mode){TransportMode.WALK->Text("🚶",style=MaterialTheme.typography.titleLarge);TransportMode.METRO->Box(Modifier.size(34.dp).background(parseColor(line.colorHex),CircleShape),contentAlignment=Alignment.Center){Text(line.code,color=Color.White,fontWeight=FontWeight.Bold)};TransportMode.RER->Box(Modifier.height(32.dp).background(parseColor(line.colorHex),RoundedCornerShape(7.dp)).padding(horizontal=8.dp),contentAlignment=Alignment.Center){Text("RER ${line.code}",color=Color.White,fontWeight=FontWeight.Bold)}}}
-@Composable fun OfficialLineBadge(s:OfficialSegment){LineBadge(MetroLine(s.lineId,s.lineCode,s.lineCode,s.mode,null))}
+@Composable fun OfficialLineBadge(s:OfficialSegment){LineBadge(MetroLine(s.lineId,s.lineCode,s.lineCode,s.mode,s.colorHex))}

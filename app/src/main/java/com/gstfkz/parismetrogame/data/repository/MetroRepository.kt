@@ -30,7 +30,7 @@ class MetroRepository(private val api:PrimApiService){
     val fromId=fromArea?.id?:s.from?.id?:return@mapNotNull null; val toId=toArea?.id?:s.to?.id?:return@mapNotNull null
     val fromName=fromArea?.name?:s.from?.name?:fromId; val toName=toArea?.name?:s.to?.name?:toId
     when(s.type){
-     "public_transport"->{val info=s.display_informations?:return@mapNotNull null;val pm=info.physical_mode.orEmpty();val mode=if(pm.contains("RapidTransit",true)||info.commercial_mode.orEmpty().contains("RER",true))TransportMode.RER else TransportMode.METRO;if(mode==TransportMode.RER&&!rerEnabled)null else OfficialSegment("",info.code?:info.commercial_mode.orEmpty(),mode,fromId,fromName,toId,toName,s.duration)}
+     "public_transport"->{val info=s.display_informations?:return@mapNotNull null;val pm=info.physical_mode.orEmpty();val mode=if(pm.contains("RapidTransit",true)||info.commercial_mode.orEmpty().contains("RER",true))TransportMode.RER else TransportMode.METRO;if(mode==TransportMode.RER&&!rerEnabled)null else OfficialSegment("",info.code?:info.commercial_mode.orEmpty(),mode,fromId,fromName,toId,toName,s.duration,info.color)}
      "street_network","crow_fly"->if(!walkEnabled||fromId==toId||fromName.trim().equals(toName.trim(),true))null else OfficialSegment("walk","Walk",TransportMode.WALK,fromId,fromName,toId,toName,s.duration)
      else->null
     }
