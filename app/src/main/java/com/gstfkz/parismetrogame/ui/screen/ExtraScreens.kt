@@ -47,6 +47,8 @@ fun SettingsScreen(
     onLanguage: (GameLanguage) -> Unit,
     onWalk: (Boolean) -> Unit,
     onRer: (Boolean) -> Unit,
+    onCountdownEnabled: (Boolean) -> Unit,
+    onCountdown: (Int, Int) -> Unit,
     onCheck: () -> Unit,
     onDismissUpdate: () -> Unit,
     onBack: () -> Unit
@@ -72,6 +74,12 @@ fun SettingsScreen(
         SettingSwitch("Metro", true, false) {}
         SettingSwitch(txt.t("Walk", "Marche"), prefs.walkEnabled, true, onWalk)
         SettingSwitch("RER", prefs.rerEnabled, true, onRer)
+        HorizontalDivider(Modifier.padding(vertical = 16.dp))
+        Text(txt.t("Countdown", "Compte à rebours"), style = MaterialTheme.typography.titleMedium)
+        SettingSwitch(txt.t("Enable countdown", "Activer le compte à rebours"), prefs.countdownEnabled, true, onCountdownEnabled)
+        if (prefs.countdownEnabled) {
+            CountdownSetting(prefs.countdownMinutes, prefs.countdownSeconds, txt, onCountdown)
+        }
         HorizontalDivider(Modifier.padding(vertical = 16.dp))
         Text(txt.t("Game version", "Version du jeu"), style = MaterialTheme.typography.titleMedium)
         Text("Paris Metro Game — ${BuildConfig.VERSION_NAME}")
@@ -164,5 +172,16 @@ private fun SettingSwitch(label: String, checked: Boolean, enabled: Boolean, onC
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
         Text(label, Modifier.padding(top = 12.dp))
         Switch(checked, onChange, enabled = enabled)
+    }
+}
+
+@Composable
+private fun CountdownSetting(minutes:Int, seconds:Int, txt:UiText, onChange:(Int,Int)->Unit){
+    Row(Modifier.fillMaxWidth(), horizontalArrangement=Arrangement.End, verticalAlignment=androidx.compose.ui.Alignment.CenterVertically){
+        OutlinedTextField(minutes.toString(), {v->v.filter(Char::isDigit).toIntOrNull()?.let{onChange(it.coerceIn(0,99),seconds)}}, label={Text(txt.t("Min","Min"))}, singleLine=true, modifier=Modifier.width(90.dp))
+        Spacer(Modifier.width(8.dp))
+        Text(":")
+        Spacer(Modifier.width(8.dp))
+        OutlinedTextField(seconds.toString().padStart(2,'0'), {v->v.filter(Char::isDigit).toIntOrNull()?.let{onChange(minutes,it.coerceIn(0,59))}}, label={Text(txt.t("Sec","Sec"))}, singleLine=true, modifier=Modifier.width(90.dp))
     }
 }

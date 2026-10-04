@@ -14,7 +14,12 @@ data class OfficialJourney(val segments:List<OfficialSegment>,val totalDurationS
 data class ScoreEntry(val score:Int,val timestamp:Long)
 sealed class GameScreen {
  data object Menu:GameScreen(); data object Loading:GameScreen()
- data class Playing(val departureStation:MetroStation,val arrivalStation:MetroStation,val segments:List<UserSegment>):GameScreen()
+ data class Playing(
+     val departureStation:MetroStation,
+     val arrivalStation:MetroStation,
+     val segments:List<UserSegment>,
+     val remainingSeconds:Int?=null
+ ):GameScreen()
  data class Result(val won:Boolean,val displayedScore:Int,val userSegments:List<UserSegment>,val officialJourneys:List<OfficialJourney>):GameScreen()
  data object Scores:GameScreen(); data object Settings:GameScreen()
  data class Error(val message:String):GameScreen()

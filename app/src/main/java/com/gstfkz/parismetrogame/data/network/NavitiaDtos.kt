@@ -64,6 +64,10 @@ data class JourneysResponseDto(
 data class JourneyDto(
     val duration: Int = 0,
     val nb_transfers: Int = 0,
+    val tags: List<String> = emptyList(),
+    val departure_date_time: String? = null,
+    val arrival_date_time: String? = null,
+    val requested_date_time: String? = null,
     val sections: List<SectionDto> = emptyList()
 )
 
