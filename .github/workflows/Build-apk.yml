@@ -77,19 +77,19 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: Paris-Metro-Game-0.8b
+          name: Paris-Metro-Game-0.9b
           path: app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
           retention-days: 30
 
       - name: Prepare release APK
-        run: cp app/build/outputs/apk/release/app-release.apk Paris-Metro-Game-v0.8b.apk
+        run: cp app/build/outputs/apk/release/app-release.apk Paris-Metro-Game-v0.9b.apk
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v0.8b
-          name: Paris Metro Game v0.8b
-          body_path: CHANGELOG_v0.8b.txt
-          files: Paris-Metro-Game-v0.8b.apk
+          tag_name: v0.9b
+          name: Paris Metro Game v0.9b
+          body_path: CHANGELOG_v0.9b.txt
+          files: Paris-Metro-Game-v0.9b.apk
           make_latest: true
