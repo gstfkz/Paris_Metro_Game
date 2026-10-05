@@ -7,6 +7,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.viewinterop.AndroidView
+import android.widget.NumberPicker
 import androidx.compose.ui.unit.dp
 import com.gstfkz.parismetrogame.BuildConfig
 import com.gstfkz.parismetrogame.data.local.*
@@ -177,11 +179,60 @@ private fun SettingSwitch(label: String, checked: Boolean, enabled: Boolean, onC
 
 @Composable
 private fun CountdownSetting(minutes:Int, seconds:Int, txt:UiText, onChange:(Int,Int)->Unit){
-    Row(Modifier.fillMaxWidth(), horizontalArrangement=Arrangement.End, verticalAlignment=androidx.compose.ui.Alignment.CenterVertically){
-        OutlinedTextField(minutes.toString(), {v->v.filter(Char::isDigit).toIntOrNull()?.let{onChange(it.coerceIn(0,99),seconds)}}, label={Text(txt.t("Min","Min"))}, singleLine=true, modifier=Modifier.width(90.dp))
-        Spacer(Modifier.width(8.dp))
-        Text(":")
-        Spacer(Modifier.width(8.dp))
-        OutlinedTextField(seconds.toString().padStart(2,'0'), {v->v.filter(Char::isDigit).toIntOrNull()?.let{onChange(minutes,it.coerceIn(0,59))}}, label={Text(txt.t("Sec","Sec"))}, singleLine=true, modifier=Modifier.width(90.dp))
+    var showPicker by remember { mutableStateOf(false) }
+    OutlinedButton(
+        onClick = { showPicker = true },
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(txt.t("Time: ", "Durée : ") + "%02d:%02d".format(minutes, seconds))
+    }
+    if(showPicker){
+        var pickedMinutes by remember { mutableIntStateOf(minutes) }
+        var pickedSeconds by remember { mutableIntStateOf(seconds) }
+        AlertDialog(
+            onDismissRequest = { showPicker = false },
+            title = { Text(txt.t("Select countdown", "Choisir le compte à rebours")) },
+            text = {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                    Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
+                        Text(txt.t("Minutes", "Minutes"), color = MaterialTheme.colorScheme.primary)
+                        AndroidView(
+                            factory = { context -> NumberPicker(context).apply {
+                                minValue = 0; maxValue = 99; value = pickedMinutes
+                                wrapSelectorWheel = true
+                                setOnValueChangedListener { _,_,new -> pickedMinutes = new }
+                            }},
+                            update = { it.value = pickedMinutes },
+                            modifier = Modifier.width(110.dp).height(150.dp)
+                        )
+                    }
+                    Text(":", style = MaterialTheme.typography.headlineLarge, modifier = Modifier.padding(top = 64.dp))
+                    Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
+                        Text(txt.t("Seconds", "Secondes"), color = MaterialTheme.colorScheme.primary)
+                        AndroidView(
+                            factory = { context -> NumberPicker(context).apply {
+                                minValue = 0; maxValue = 59; value = pickedSeconds
+                                wrapSelectorWheel = true
+                                setOnValueChangedListener { _,_,new -> pickedSeconds = new }
+                            }},
+                            update = { it.value = pickedSeconds },
+                            modifier = Modifier.width(110.dp).height(150.dp)
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    if(pickedMinutes == 0 && pickedSeconds == 0) pickedSeconds = 1
+                    onChange(pickedMinutes, pickedSeconds)
+                    showPicker = false
+                }) { Text(txt.t("OK", "OK"), color = MaterialTheme.colorScheme.primary) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showPicker = false }) {
+                    Text(txt.t("Cancel", "Annuler"), color = MaterialTheme.colorScheme.primary)
+                }
+            }
+        )
     }
 }
