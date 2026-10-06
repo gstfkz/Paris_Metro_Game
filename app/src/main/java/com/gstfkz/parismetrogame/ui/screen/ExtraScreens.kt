@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import android.widget.NumberPicker
@@ -193,9 +194,27 @@ private fun CountdownSetting(minutes:Int, seconds:Int, txt:UiText, onChange:(Int
             onDismissRequest = { showPicker = false },
             title = { Text(txt.t("Select countdown", "Choisir le compte à rebours")) },
             text = {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                    Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
-                        Text(txt.t("Minutes", "Minutes"), color = MaterialTheme.colorScheme.primary)
+                Column(Modifier.fillMaxWidth()) {
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                        Text(
+                            txt.t("Minutes", "Minutes"),
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.width(110.dp),
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        )
+                        Spacer(Modifier.width(28.dp))
+                        Text(
+                            txt.t("Seconds", "Secondes"),
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.width(110.dp),
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        )
+                    }
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                    ) {
                         AndroidView(
                             factory = { context -> NumberPicker(context).apply {
                                 minValue = 0; maxValue = 99; value = pickedMinutes
@@ -203,12 +222,14 @@ private fun CountdownSetting(minutes:Int, seconds:Int, txt:UiText, onChange:(Int
                                 setOnValueChangedListener { _,_,new -> pickedMinutes = new }
                             }},
                             update = { it.value = pickedMinutes },
-                            modifier = Modifier.width(110.dp).height(150.dp)
+                            modifier = Modifier.width(110.dp).height(150.dp).clipToBounds()
                         )
-                    }
-                    Text(":", style = MaterialTheme.typography.headlineLarge, modifier = Modifier.padding(top = 64.dp))
-                    Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
-                        Text(txt.t("Seconds", "Secondes"), color = MaterialTheme.colorScheme.primary)
+                        Text(
+                            ":",
+                            style = MaterialTheme.typography.headlineLarge,
+                            modifier = Modifier.width(28.dp),
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        )
                         AndroidView(
                             factory = { context -> NumberPicker(context).apply {
                                 minValue = 0; maxValue = 59; value = pickedSeconds
@@ -216,7 +237,7 @@ private fun CountdownSetting(minutes:Int, seconds:Int, txt:UiText, onChange:(Int
                                 setOnValueChangedListener { _,_,new -> pickedSeconds = new }
                             }},
                             update = { it.value = pickedSeconds },
-                            modifier = Modifier.width(110.dp).height(150.dp)
+                            modifier = Modifier.width(110.dp).height(150.dp).clipToBounds()
                         )
                     }
                 }
