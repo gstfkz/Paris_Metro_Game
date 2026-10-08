@@ -77,23 +77,27 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: Paris-Metro-Game-0.9.3b
+          name: Paris-Metro-Game-0.9.4b
           path: app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
           retention-days: 30
 
       - name: Prepare release APK
-        run: cp app/build/outputs/apk/release/app-release.apk Paris-Metro-Game-v0.9.3b.apk
+        run: cp app/build/outputs/apk/release/app-release.apk Paris-Metro-Game-v0.9.4b.apk
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v0.9.3b
-          name: Paris Metro Game v0.9.3b
+          tag_name: v0.9.4b
+          name: Paris Metro Game v0.9.4b
           body: |
-            What's New in v0.9.3b
-            - Added persistent timestamped diagnostic logs for PRIM API requests, HTTP responses, request durations, and network errors.
-            - Added a View logs button in Settings and a dedicated logs screen with Copy and Back buttons.
-            - Sensitive API keys and HTTP request/response bodies are excluded from diagnostic logs.
-          files: Paris-Metro-Game-v0.9.3b.apk
+            What's New in v0.9.4b
+            - Fixed the log viewer layout so Copy, Clear, and Back buttons remain visible above Android navigation controls.
+            - Added scrolling to browse the entire log history.
+            - Added a Clear button to erase all saved logs.
+            - Timestamps are now displayed in bold.
+            - Simplified the log viewer title to "Logs".
+          files: Paris-Metro-Game-v0.9.4b.apk
           make_latest: true
+          prerelease: false
+          draft: false
