@@ -24,8 +24,8 @@ android {
         applicationId = "com.gstfkz.parismetrogame"
         minSdk = 26
         targetSdk = 35
-        versionCode = 12
-        versionName = "0.9.3b"
+        versionCode = 13
+        versionName = "0.9.4b"
 
         // Clé API PRIM (Île-de-France Mobilités / Navitia) lue depuis local.properties
         // pour ne pas la committer en clair dans le code. Voir README.md.
