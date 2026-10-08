@@ -21,6 +21,6 @@ sealed class GameScreen {
      val remainingSeconds:Int?=null
  ):GameScreen()
  data class Result(val won:Boolean,val displayedScore:Int,val userSegments:List<UserSegment>,val officialJourneys:List<OfficialJourney>):GameScreen()
- data object Scores:GameScreen(); data object Settings:GameScreen()
+ data object Scores:GameScreen(); data object Settings:GameScreen(); data object Logs:GameScreen()
  data class Error(val message:String):GameScreen()
 }
