@@ -1,6 +1,9 @@
 package com.gstfkz.parismetrogame.data.network
 
 import kotlinx.serialization.json.Json
+import android.content.Context
+import com.gstfkz.parismetrogame.data.local.PrimLogStore
+import java.util.concurrent.TimeUnit
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
@@ -16,7 +19,8 @@ object PrimApiClient {
      * abonnement à l'API "Navitia" dans l'espace développeur). Voir BuildConfig.PRIM_API_KEY,
      * alimenté depuis local.properties.
      */
-    fun create(apiKey: String): PrimApiService {
+    fun create(apiKey: String, context: Context): PrimApiService {
+        val logStore = PrimLogStore(context)
         val apiKeyInterceptor = Interceptor { chain: Interceptor.Chain ->
             val request = chain.request().newBuilder()
                 .addHeader("apikey", apiKey)
@@ -24,8 +28,22 @@ object PrimApiClient {
             chain.proceed(request)
         }
 
-        val logging = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BASIC
+        val logging = Interceptor { chain ->
+            val request = chain.request()
+            val start = System.nanoTime()
+            // Never persist request headers, query secrets, or response bodies.
+            val path = request.url.encodedPath
+            logStore.append("REQUEST ${request.method} ${path}")
+            try {
+                val response = chain.proceed(request)
+                val elapsed = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start)
+                logStore.append("RESPONSE ${request.method} ${path} HTTP ${response.code} ${elapsed}ms")
+                response
+            } catch (error: Exception) {
+                val elapsed = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start)
+                logStore.append("ERROR ${request.method} ${path} ${error.javaClass.simpleName} ${elapsed}ms")
+                throw error
+            }
         }
 
         val okHttpClient = OkHttpClient.Builder()
