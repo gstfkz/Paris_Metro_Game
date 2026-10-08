@@ -16,6 +16,7 @@ class PrimLogStore(context: Context) {
             file.appendText("[$stamp] $message\n")
         }
     }
+    fun clear() = synchronized(lock) { file.writeText("") }
     fun readAll(): String = synchronized(lock) {
         if (file.exists()) file.readText() else ""
     }
