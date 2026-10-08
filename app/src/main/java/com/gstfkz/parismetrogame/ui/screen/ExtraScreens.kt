@@ -263,21 +263,48 @@ private fun CountdownSetting(minutes:Int, seconds:Int, txt:UiText, onChange:(Int
 }
 
 @Composable
-fun LogsScreen(logs: String, txt: UiText, onBack: () -> Unit) {
+fun LogsScreen(txt: UiText, onBack: () -> Unit) {
     val context = LocalContext.current
-    Column(Modifier.fillMaxSize().safeDrawingPadding().padding(24.dp)) {
-        Text(txt.t("PRIM API logs", "Logs API PRIM"), style = MaterialTheme.typography.headlineLarge)
-        Spacer(Modifier.height(12.dp))
-        androidx.compose.foundation.text.selection.SelectionContainer {
-            LazyColumn(Modifier.weight(1f).fillMaxWidth()) {
-                item { Text(logs.ifBlank { txt.t("No logs yet.", "Aucun log pour le moment.") }) }
+    val store = remember(context) { PrimLogStore(context) }
+    var logs by remember { mutableStateOf(store.readAll()) }
+    val lines = remember(logs) { logs.lineSequence().filter { it.isNotBlank() }.toList() }
+    Column(Modifier.fillMaxSize().safeDrawingPadding().padding(horizontal = 16.dp, vertical = 12.dp)) {
+        Text("Logs", style = MaterialTheme.typography.headlineLarge)
+        Spacer(Modifier.height(8.dp))
+        LazyColumn(
+            modifier = Modifier.weight(1f).fillMaxWidth(),
+            contentPadding = PaddingValues(bottom = 12.dp)
+        ) {
+            items(lines) { line ->
+                val timestampEnd = if (line.startsWith("[")) line.indexOf(']') else -1
+                val styled = androidx.compose.ui.text.buildAnnotatedString {
+                    if (timestampEnd >= 0) {
+                        pushStyle(androidx.compose.ui.text.SpanStyle(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold))
+                        append(line.substring(0, timestampEnd + 1))
+                        pop()
+                        append(line.substring(timestampEnd + 1))
+                    } else append(line)
+                }
+                Text(styled, style = MaterialTheme.typography.bodySmall)
+                Spacer(Modifier.height(6.dp))
             }
+            if (lines.isEmpty()) item { Text(txt.t("No logs yet.", "Aucun log pour le moment.")) }
         }
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        HorizontalDivider()
+        Spacer(Modifier.height(8.dp))
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+        ) {
             OutlinedButton(onClick = {
-                val clipboard = context.getSystemService(ClipboardManager::class.java)
-                clipboard.setPrimaryClip(ClipData.newPlainText("PRIM API logs", logs))
+                context.getSystemService(ClipboardManager::class.java)
+                    .setPrimaryClip(ClipData.newPlainText("PRIM API logs", logs))
             }) { Text(txt.t("Copy", "Copier")) }
+            OutlinedButton(onClick = {
+                store.clear()
+                logs = ""
+            }) { Text(txt.t("Clear", "Effacer")) }
             Button(onClick = onBack) { Text(txt.t("Back", "Retour")) }
         }
     }
