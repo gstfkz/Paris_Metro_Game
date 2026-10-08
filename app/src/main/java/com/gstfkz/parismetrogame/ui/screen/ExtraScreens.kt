@@ -10,6 +10,8 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import android.widget.NumberPicker
+import android.content.ClipData
+import android.content.ClipboardManager
 import androidx.compose.ui.unit.dp
 import com.gstfkz.parismetrogame.BuildConfig
 import com.gstfkz.parismetrogame.data.local.*
@@ -54,6 +56,7 @@ fun SettingsScreen(
     onCountdown: (Int, Int) -> Unit,
     onCheck: () -> Unit,
     onDismissUpdate: () -> Unit,
+    onLogs: () -> Unit,
     onBack: () -> Unit
 ) {
     val ctx = LocalContext.current
@@ -88,6 +91,7 @@ fun SettingsScreen(
         Text("Paris Metro Game — ${BuildConfig.VERSION_NAME}")
         Spacer(Modifier.height(12.dp))
         Button(onCheck) { Text(txt.t("Check for updates", "Vérifier les mises à jour")) }
+        OutlinedButton(onLogs, colors = ButtonDefaults.outlinedButtonColors(containerColor = androidx.compose.ui.graphics.Color.White, contentColor = MaterialTheme.colorScheme.primary)) { Text(txt.t("View logs", "Voir les logs")) }
         Spacer(Modifier.weight(1f))
         Button(onBack, Modifier.fillMaxWidth()) { Text(txt.t("Back", "Retour")) }
     }
@@ -255,5 +259,26 @@ private fun CountdownSetting(minutes:Int, seconds:Int, txt:UiText, onChange:(Int
                 }
             }
         )
+    }
+}
+
+@Composable
+fun LogsScreen(logs: String, txt: UiText, onBack: () -> Unit) {
+    val context = LocalContext.current
+    Column(Modifier.fillMaxSize().safeDrawingPadding().padding(24.dp)) {
+        Text(txt.t("PRIM API logs", "Logs API PRIM"), style = MaterialTheme.typography.headlineLarge)
+        Spacer(Modifier.height(12.dp))
+        androidx.compose.foundation.text.selection.SelectionContainer {
+            LazyColumn(Modifier.weight(1f).fillMaxWidth()) {
+                item { Text(logs.ifBlank { txt.t("No logs yet.", "Aucun log pour le moment.") }) }
+            }
+        }
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            OutlinedButton(onClick = {
+                val clipboard = context.getSystemService(ClipboardManager::class.java)
+                clipboard.setPrimaryClip(ClipData.newPlainText("PRIM API logs", logs))
+            }) { Text(txt.t("Copy", "Copier")) }
+            Button(onClick = onBack) { Text(txt.t("Back", "Retour")) }
+        }
     }
 }
