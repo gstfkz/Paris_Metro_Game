@@ -40,7 +40,13 @@ class MetroRepository(private val api:PrimApiService){
      else->null
     }
    }
-   if(segs.isEmpty())null else OfficialJourney(segs,j.duration)
+   // Reject routes whose displayed destination differs from the requested station.
+   // A terminal walking section is never accepted, even when walking is enabled.
+   val lastSection = j.sections.lastOrNull()
+   val terminalWalk = lastSection?.type == "street_network" || lastSection?.type == "crow_fly"
+   val last = segs.lastOrNull()
+   if (terminalWalk || last == null || last.mode == TransportMode.WALK ||
+       last.toStationId != to) null else OfficialJourney(segs,j.duration)
   }
   val min=parsed.minOfOrNull{it.totalDurationSeconds}?:return emptyList();return parsed.filter{it.totalDurationSeconds==min}.distinctBy{it.segments.map{s->listOf(s.mode,s.lineCode,s.fromStationId,s.toStationId)}}
  }
