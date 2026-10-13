@@ -77,27 +77,31 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: Paris-Metro-Game-0.9.4b
+          name: Paris-Metro-Game-0.9.5b
           path: app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
           retention-days: 30
 
       - name: Prepare release APK
-        run: cp app/build/outputs/apk/release/app-release.apk Paris-Metro-Game-v0.9.4b.apk
+        run: cp app/build/outputs/apk/release/app-release.apk Paris-Metro-Game-v0.9.5b.apk
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v0.9.4b
-          name: Paris Metro Game v0.9.4b
+          tag_name: v0.9.5b
+          name: Paris Metro Game v0.9.5b
           body: |
-            What's New in v0.9.4b
-            - Fixed the log viewer layout so Copy, Clear, and Back buttons remain visible above Android navigation controls.
-            - Added scrolling to browse the entire log history.
-            - Added a Clear button to erase all saved logs.
-            - Timestamps are now displayed in bold.
-            - Simplified the log viewer title to "Logs".
-          files: Paris-Metro-Game-v0.9.4b.apk
+            ## Bug fixes
+            - Excluded official journeys ending with a walking section, preventing a displayed destination from differing from the requested destination.
+            - Filtered official journeys by the requested destination station.
+            - Fixed long station names being cut off on the game screen.
+
+            ## New features
+            - No new features in this release.
+
+            ## Interface improvements
+            - Route headings can now wrap onto two lines to better display long station names.
+          files: Paris-Metro-Game-v0.9.5b.apk
           make_latest: true
           prerelease: false
           draft: false
