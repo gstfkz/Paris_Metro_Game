@@ -77,31 +77,31 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: Paris-Metro-Game-0.9.5b
+          name: Paris-Metro-Game-0.9.6b
           path: app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
           retention-days: 30
 
       - name: Prepare release APK
-        run: cp app/build/outputs/apk/release/app-release.apk Paris-Metro-Game-v0.9.5b.apk
+        run: cp app/build/outputs/apk/release/app-release.apk Paris-Metro-Game-v0.9.6b.apk
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v0.9.5b
-          name: Paris Metro Game v0.9.5b
+          tag_name: v0.9.6b
+          name: Paris Metro Game v0.9.6b
           body: |
             ## Bug fixes
-            - Excluded official journeys ending with a walking section, preventing a displayed destination from differing from the requested destination.
-            - Filtered official journeys by the requested destination station.
-            - Fixed long station names being cut off on the game screen.
+            - Fixed overly restrictive filtering that could leave the game without any official PRIM itinerary.
+            - Removed strict station-ID matching because Navitia may represent the same station with different stop identifiers.
+            - Kept genuine terminal walking sections excluded while allowing zero-distance station access sections.
 
             ## New features
             - No new features in this release.
 
             ## Interface improvements
-            - Route headings can now wrap onto two lines to better display long station names.
-          files: Paris-Metro-Game-v0.9.5b.apk
+            - No interface changes in this release.
+          files: Paris-Metro-Game-v0.9.6b.apk
           make_latest: true
           prerelease: false
           draft: false
