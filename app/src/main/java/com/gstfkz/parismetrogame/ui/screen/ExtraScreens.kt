@@ -1,6 +1,8 @@
 package com.gstfkz.parismetrogame.ui.screen
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
@@ -68,6 +70,7 @@ fun SettingsScreen(
     var downloadError by remember { mutableStateOf<String?>(null) }
 
     Column(Modifier.fillMaxSize().safeDrawingPadding().padding(24.dp)) {
+        Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState())) {
         Text(txt.t("Settings", "Paramètres"), style = MaterialTheme.typography.headlineLarge)
         Spacer(Modifier.height(16.dp))
         Text(txt.t("Game language", "Langue du jeu"), style = MaterialTheme.typography.titleMedium)
@@ -96,7 +99,8 @@ fun SettingsScreen(
         Spacer(Modifier.height(12.dp))
         Button(onCheck) { Text(txt.t("Check for updates", "Vérifier les mises à jour")) }
         OutlinedButton(onLogs, colors = ButtonDefaults.outlinedButtonColors(containerColor = androidx.compose.ui.graphics.Color.White, contentColor = MaterialTheme.colorScheme.primary)) { Text(txt.t("View logs", "Voir les logs")) }
-        Spacer(Modifier.weight(1f))
+        }
+        Spacer(Modifier.height(12.dp))
         Button(onBack, Modifier.fillMaxWidth()) { Text(txt.t("Back", "Retour")) }
     }
 
