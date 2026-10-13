@@ -77,31 +77,32 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: Paris-Metro-Game-0.9.6b
+          name: Paris-Metro-Game-0.9.7b
           path: app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
           retention-days: 30
 
       - name: Prepare release APK
-        run: cp app/build/outputs/apk/release/app-release.apk Paris-Metro-Game-v0.9.6b.apk
+        run: cp app/build/outputs/apk/release/app-release.apk Paris-Metro-Game-v0.9.7b.apk
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v0.9.6b
-          name: Paris Metro Game v0.9.6b
+          tag_name: v0.9.7b
+          name: Paris Metro Game v0.9.7b
           body: |
             ## Bug fixes
-            - Fixed overly restrictive filtering that could leave the game without any official PRIM itinerary.
-            - Removed strict station-ID matching because Navitia may represent the same station with different stop identifiers.
-            - Kept genuine terminal walking sections excluded while allowing zero-distance station access sections.
+            - Fixed journey searches that could exclude valid metro routes with internal walking transfers, including cases such as Danube to Notre-Dame-de-Lorette.
+            - Increased the number of candidate routes requested from PRIM.
+            - Walking-disabled games now reject walking connections between different stations without globally forbidding walking in the API query.
 
             ## New features
-            - No new features in this release.
+            - Added a "Works and disruptions" section with a "Real traffic context" switch, disabled by default.
+            - Enabled: PRIM realtime journeys. Disabled: PRIM base_schedule journeys, which may still include planned network changes.
 
             ## Interface improvements
-            - No interface changes in this release.
-          files: Paris-Metro-Game-v0.9.6b.apk
+            - Added bilingual English/French traffic-context settings.
+          files: Paris-Metro-Game-v0.9.7b.apk
           make_latest: true
           prerelease: false
           draft: false
