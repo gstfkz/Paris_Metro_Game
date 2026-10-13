@@ -9,6 +9,7 @@ data class GamePreferences(
     val walkEnabled: Boolean = true,
     val rerEnabled: Boolean = true,
     val countdownEnabled: Boolean = false,
+    val realTrafficEnabled: Boolean = false,
     val countdownMinutes: Int = 1,
     val countdownSeconds: Int = 0
 ) {
@@ -22,12 +23,14 @@ class GameSettingsStore(context: Context) {
         walkEnabled = prefs.getBoolean("walk_enabled", true),
         rerEnabled = prefs.getBoolean("rer_enabled", true),
         countdownEnabled = prefs.getBoolean("countdown_enabled", false),
+        realTrafficEnabled = prefs.getBoolean("real_traffic_enabled", false),
         countdownMinutes = prefs.getInt("countdown_minutes", 1).coerceIn(0, 99),
         countdownSeconds = prefs.getInt("countdown_seconds", 0).coerceIn(0, 59)
     )
     fun setLanguage(value: GameLanguage) = prefs.edit().putString("language", if (value == GameLanguage.FRENCH) "fr" else "en").apply()
     fun setWalkEnabled(value: Boolean) = prefs.edit().putBoolean("walk_enabled", value).apply()
     fun setRerEnabled(value: Boolean) = prefs.edit().putBoolean("rer_enabled", value).apply()
+    fun setRealTrafficEnabled(value: Boolean) = prefs.edit().putBoolean("real_traffic_enabled", value).apply()
     fun setCountdownEnabled(value: Boolean) = prefs.edit().putBoolean("countdown_enabled", value).apply()
     fun setCountdown(minutes: Int, seconds: Int) = prefs.edit()
         .putInt("countdown_minutes", minutes.coerceIn(0, 99))
