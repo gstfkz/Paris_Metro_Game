@@ -22,14 +22,22 @@ class MetroRepository(private val api:PrimApiService){
   return n.stationsByLine.filterKeys{it in lineIds}.values.flatten().distinctBy{it.id}.sortedBy{it.name.lowercase()}
  }
  fun pickRandomStationPair(n:MetroNetwork,rerEnabled:Boolean):Pair<MetroStation,MetroStation>{val p=allStations(n,rerEnabled);require(p.size>=2);var a:MetroStation;var b:MetroStation;do{a=p.random();b=p.random()}while(a.id==b.id);return a to b}
- suspend fun fetchOfficialJourneys(from:String,to:String,walkEnabled:Boolean,rerEnabled:Boolean):List<OfficialJourney>{
-  val forbidden=PrimApiService.BASE_FORBIDDEN_MODES.toMutableList().apply{if(!rerEnabled)add("physical_mode:RapidTransit");if(!walkEnabled){add("physical_mode:Walking");add("physical_mode:Foot")}}
-  val rawJourneys=api.getJourneys(from,to,forbidden,10).journeys
+ suspend fun fetchOfficialJourneys(from:String,to:String,walkEnabled:Boolean,rerEnabled:Boolean,realTrafficEnabled:Boolean=false):List<OfficialJourney>{
+  val forbidden=PrimApiService.BASE_FORBIDDEN_MODES.toMutableList().apply{if(!rerEnabled)add("physical_mode:RapidTransit")}
+  val rawJourneys=api.getJourneys(from,to,forbidden,20,dataFreshness=if(realTrafficEnabled)"realtime" else "base_schedule").journeys
   // Navitia can create extra later/earlier journeys only to satisfy `count`; those are tagged
   // `next`/`previous`. They must not compete with the journeys calculated for the requested
   // departure time, otherwise a later train with a shorter in-vehicle duration can be picked.
   val candidates=rawJourneys.filterNot{j->j.tags.any{it.equals("next",true)||it.equals("previous",true)}}.ifEmpty{rawJourneys}
   val parsed=candidates.mapNotNull{j->
+   val hasForbiddenWalk = !walkEnabled && j.sections.any { s ->
+       if (s.type !in listOf("street_network", "crow_fly")) false else {
+           val a = s.from?.stop_point?.stop_area?.name ?: s.from?.stop_area?.name ?: s.from?.name
+           val b = s.to?.stop_point?.stop_area?.name ?: s.to?.stop_area?.name ?: s.to?.name
+           !a.isNullOrBlank() && !b.isNullOrBlank() && !a.trim().equals(b.trim(), ignoreCase = true)
+       }
+   }
+   if (hasForbiddenWalk) return@mapNotNull null
    val segs=j.sections.mapNotNull{s->
     val fromArea=s.from?.stop_point?.stop_area?:s.from?.stop_area; val toArea=s.to?.stop_point?.stop_area?:s.to?.stop_area
     val fromId=fromArea?.id?:s.from?.id?:return@mapNotNull null; val toId=toArea?.id?:s.to?.id?:return@mapNotNull null
