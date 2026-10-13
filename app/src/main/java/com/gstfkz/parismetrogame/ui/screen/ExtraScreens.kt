@@ -53,6 +53,7 @@ fun SettingsScreen(
     onWalk: (Boolean) -> Unit,
     onRer: (Boolean) -> Unit,
     onCountdownEnabled: (Boolean) -> Unit,
+    onRealTraffic: (Boolean) -> Unit,
     onCountdown: (Int, Int) -> Unit,
     onCheck: () -> Unit,
     onDismissUpdate: () -> Unit,
@@ -86,6 +87,9 @@ fun SettingsScreen(
         if (prefs.countdownEnabled) {
             CountdownSetting(prefs.countdownMinutes, prefs.countdownSeconds, txt, onCountdown)
         }
+        HorizontalDivider(Modifier.padding(vertical = 16.dp))
+        Text(txt.t("Works and disruptions", "Travaux et perturbations"), style = MaterialTheme.typography.titleMedium)
+        SettingSwitch(txt.t("Real traffic context", "Contexte réel du trafic"), prefs.realTrafficEnabled, true, onRealTraffic)
         HorizontalDivider(Modifier.padding(vertical = 16.dp))
         Text(txt.t("Game version", "Version du jeu"), style = MaterialTheme.typography.titleMedium)
         Text("Paris Metro Game — ${BuildConfig.VERSION_NAME}")
