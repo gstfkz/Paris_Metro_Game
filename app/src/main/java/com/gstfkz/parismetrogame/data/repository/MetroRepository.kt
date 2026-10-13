@@ -40,13 +40,24 @@ class MetroRepository(private val api:PrimApiService){
      else->null
     }
    }
-   // Reject routes whose displayed destination differs from the requested station.
-   // A terminal walking section is never accepted, even when walking is enabled.
+   // Navitia may return different stop-point and stop-area identifiers for the same station.
+   // Ignore terminal zero-distance access sections; reject only a genuine final walk.
    val lastSection = j.sections.lastOrNull()
-   val terminalWalk = lastSection?.type == "street_network" || lastSection?.type == "crow_fly"
+   val terminalWalk = lastSection?.type in listOf("street_network", "crow_fly") &&
+       run {
+           val origin = lastSection?.from?.stop_point?.stop_area ?: lastSection?.from?.stop_area
+           val destination = lastSection?.to?.stop_point?.stop_area ?: lastSection?.to?.stop_area
+           val originId = origin?.id ?: lastSection?.from?.id
+           val destinationId = destination?.id ?: lastSection?.to?.id
+           val originName = origin?.name ?: lastSection?.from?.name
+           val destinationName = destination?.name ?: lastSection?.to?.name
+           originId != destinationId &&
+               !originName.isNullOrBlank() && !destinationName.isNullOrBlank() &&
+               !originName.trim().equals(destinationName.trim(), ignoreCase = true)
+       }
    val last = segs.lastOrNull()
-   if (terminalWalk || last == null || last.mode == TransportMode.WALK ||
-       last.toStationId != to) null else OfficialJourney(segs,j.duration)
+   if (terminalWalk || last == null || last.mode == TransportMode.WALK) null
+   else OfficialJourney(segs, j.duration)
   }
   val min=parsed.minOfOrNull{it.totalDurationSeconds}?:return emptyList();return parsed.filter{it.totalDurationSeconds==min}.distinctBy{it.segments.map{s->listOf(s.mode,s.lineCode,s.fromStationId,s.toStationId)}}
  }
