@@ -17,7 +17,7 @@ class MetroRepository(private val api: PrimApiService) {
             all.map { line -> async {
                 val raw = api.getStopAreasForLine(line.id).stop_areas
                 val filtered = if (line.mode == TransportMode.RER) raw.filter { it.isInParis() } else raw
-                line.id to filtered.map { MetroStation(it.id, it.name, it.coord?.lat, it.coord?.lon) }
+                line.id to filtered.map { MetroStation(it.id, it.name, it.coord?.lat?.toDoubleOrNull(), it.coord?.lon?.toDoubleOrNull()) }
                     .distinctBy { it.id }.sortedBy { it.name.lowercase() }
             } }.associate { it.await() }
         }
