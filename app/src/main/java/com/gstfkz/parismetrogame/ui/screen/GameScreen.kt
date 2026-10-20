@@ -12,7 +12,40 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.gstfkz.parismetrogame.data.model.*
-@Composable fun GameScreen(departureStation:MetroStation,arrivalStation:MetroStation,segments:List<UserSegment>,availableLines:List<MetroLine>,stationsForLine:(MetroLine)->List<MetroStation>,txt:UiText,onSegmentChange:(Int,UserSegment)->Unit,onAddRow:()->Unit,onRemoveRow:(Int)->Unit,onVerify:()->Unit,remainingSeconds:Int?=null){Column(Modifier.fillMaxSize().safeDrawingPadding().padding(16.dp)){AutoFitRouteTitle(departureStation.name,arrivalStation.name);remainingSeconds?.let{CountdownText(it)};HorizontalDivider(Modifier.padding(vertical=16.dp));LazyColumn(Modifier.weight(1f)){items(segments.size){i->SegmentRow(segments[i],availableLines,stationsForLine,txt,{onSegmentChange(i,it)},if(segments.size>1){{onRemoveRow(i)}}else null);HorizontalDivider(Modifier.padding(vertical=10.dp))}};if(segments.lastOrNull()?.isComplete==true)Row(Modifier.fillMaxWidth().padding(bottom=8.dp),horizontalArrangement=Arrangement.SpaceBetween){FilledIconButton(onAddRow){Icon(Icons.Default.Add,txt.t("Add","Ajouter"))};Button(onVerify){Text(txt.t("Check","Vérifier"))}}}}
+@Composable
+fun GameScreen(
+    departureStation: MetroStation, arrivalStation: MetroStation,
+    segments: List<UserSegment>, availableLines: List<MetroLine>,
+    stationsForLine: (MetroLine) -> List<MetroStation>, txt: UiText,
+    onSegmentChange: (Int, UserSegment) -> Unit, onAddRow: () -> Unit,
+    onRemoveRow: (Int) -> Unit, onVerify: () -> Unit, remainingSeconds: Int? = null
+) {
+    var showMap by remember { mutableStateOf(false) }
+    Column(Modifier.fillMaxSize().safeDrawingPadding().padding(16.dp)) {
+        AutoFitRouteTitle(departureStation.name, arrivalStation.name)
+        remainingSeconds?.let { CountdownText(it) }
+        HorizontalDivider(Modifier.padding(vertical = 16.dp))
+        LazyColumn(Modifier.weight(1f)) {
+            items(segments.size) { i ->
+                SegmentRow(segments[i], availableLines, stationsForLine, txt,
+                    { onSegmentChange(i, it) },
+                    if (segments.size > 1) {{ onRemoveRow(i) }} else null)
+                HorizontalDivider(Modifier.padding(vertical = 10.dp))
+            }
+        }
+        if (segments.lastOrNull()?.isComplete == true) {
+            Row(Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween) {
+                FilledIconButton(onClick = onAddRow) { Icon(Icons.Default.Add, txt.t("Add", "Ajouter")) }
+                Button(onClick = onVerify) { Text(txt.t("Check", "Vérifier")) }
+            }
+        }
+        OutlinedButton(onClick = { showMap = true }, modifier = Modifier.fillMaxWidth()) {
+            Text(txt.t("Show interactive map", "Afficher la carte interactive"))
+        }
+    }
+    if (showMap) InteractiveMapDialog(departureStation, arrivalStation, txt) { showMap = false }
+}
 @Composable private fun AutoFitRouteTitle(a:String,b:String){val n=a.length+b.length;val style=when{n>50->MaterialTheme.typography.bodyMedium;n>38->MaterialTheme.typography.bodyLarge;n>28->MaterialTheme.typography.titleMedium;else->MaterialTheme.typography.headlineSmall};Text(
     "$a  →  $b",
     modifier = Modifier.fillMaxWidth(),
