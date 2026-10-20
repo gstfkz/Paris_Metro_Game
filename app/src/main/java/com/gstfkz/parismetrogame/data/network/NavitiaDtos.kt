@@ -47,7 +47,7 @@ data class StopAreaDto(
 )
 
 @Serializable
-data class CoordinateDto(val lat: Double, val lon: Double)
+data class CoordinateDto(val lat: String, val lon: String)
 
 @Serializable
 data class AdministrativeRegionDto(
