@@ -42,8 +42,12 @@ data class StopAreasResponseDto(
 data class StopAreaDto(
     val id: String,
     val name: String,
+    val coord: CoordinateDto? = null,
     val administrative_regions: List<AdministrativeRegionDto> = emptyList()
 )
+
+@Serializable
+data class CoordinateDto(val lat: Double, val lon: Double)
 
 @Serializable
 data class AdministrativeRegionDto(
