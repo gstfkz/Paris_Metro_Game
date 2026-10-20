@@ -77,29 +77,34 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: Paris-Metro-Game-0.9.8.1b
+          name: Paris-Metro-Game-0.9.9b
           path: app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
           retention-days: 30
 
       - name: Prepare release APK
-        run: cp app/build/outputs/apk/release/app-release.apk Paris-Metro-Game-v0.9.8.1b.apk
+        run: cp app/build/outputs/apk/release/app-release.apk Paris-Metro-Game-v0.9.9b.apk
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v0.9.8.1b
-          name: Paris Metro Game v0.9.8.1b
+          tag_name: v0.9.9b
+          name: Paris Metro Game v0.9.9b
           body: |
             ## Bug fixes
-            - Fixed the Settings screen layout where the "View logs" and "Back" buttons could overlap on smaller screens.
+            - Improved station-to-station continuity validation for official journeys when walking is disabled, including transfers.
+            - Prevented walking transfers between different station areas from being accepted in no-walking games.
+            - Improved handling of station coordinates returned by PRIM.
+            - Expanded candidate journey validation to reduce misleading route results. Note: PRIM base schedules can still include planned works.
 
             ## New features
-            - No new features in this release.
+            - Validates candidate station pairs before starting a no-walking game, retrying up to 12 times if no valid route is found.
+            - Added an interactive OpenStreetMap popup with a green departure marker and a red arrival marker, supporting pan and zoom.
 
             ## Interface improvements
-            - Added vertical scrolling to the Settings content while keeping the Back button accessible at the bottom of the screen.
-          files: Paris-Metro-Game-v0.9.8.1b.apk
+            - Added the "Show interactive map" / "Afficher la carte interactive" button to the game screen.
+            - Added a close control and OpenStreetMap attribution in the map popup.
+          files: Paris-Metro-Game-v0.9.9b.apk
           make_latest: true
           prerelease: false
           draft: false
